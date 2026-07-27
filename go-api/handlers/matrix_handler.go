@@ -31,7 +31,18 @@ println("Rows:", len(request.Matrix))
 			})
 	}
 
-	return c.JSON(fiber.Map{
-		"valid": true,
+	result, err := services.ComputeQR(
+	request.Matrix,
+)
+
+if err != nil {
+
+	return c.Status(
+		fiber.StatusInternalServerError,
+	).JSON(fiber.Map{
+		"error": err.Error(),
 	})
+}
+
+return c.JSON(result)
 }
