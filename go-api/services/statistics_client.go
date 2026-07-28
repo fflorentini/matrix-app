@@ -3,9 +3,12 @@ package services
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
 	"matrix-app/go-api/models"
 	"net/http"
 	"os"
+	"time"
 )
 
 func FetchStatistics(
@@ -29,7 +32,11 @@ func FetchStatistics(
 		apiURL = "http://localhost:3000/api/statistics"
 	}
 
-	resp, err := http.Post(
+	client := &http.Client{
+		Timeout: 20 * time.Second,
+	}
+
+	resp, err := client.Post(
 		apiURL,
 		"application/json",
 		bytes.NewBuffer(body),
@@ -40,11 +47,22 @@ func FetchStatistics(
 
 	defer resp.Body.Close()
 
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf(
+			"statistics api returned status %d: %s",
+			resp.StatusCode,
+			string(bodyBytes),
+		)
+	}
+
 	var result models.StatisticsResponse
 
-	err = json.NewDecoder(resp.Body).
-		Decode(&result)
-
+	err = json.Unmarshal(bodyBytes, &result)
 	if err != nil {
 		return nil, err
 	}
