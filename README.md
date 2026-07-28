@@ -29,6 +29,28 @@ https://matrix-app-node-api.onrender.com
 
 ---
 
+## Screenshots
+
+### Landing Page
+
+The application entry point displaying the platform title and authentication action.
+
+![Landing Page](docs/images/home.png)
+
+### Matrix Input
+
+After authentication, users can enter matrix values and submit them for QR decomposition.
+
+![Matrix Input](docs/images/matrix-input.png)
+
+### QR Decomposition Results
+
+Displays the computed Q matrix, R matrix, and generated statistical analysis returned by the distributed backend services.
+
+![QR Results](docs/images/results.png)
+
+---
+
 ## Overview
 
 This project demonstrates a distributed architecture composed of three layers:
