@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"matrix-app/go-api/handlers"
+	"matrix-app/go-api/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -17,7 +18,13 @@ func main() {
 		})
 	})
 
-	app.Post("/api/qr", handlers.ValidateMatrix)
+	app.Post("/login", handlers.Login)
+
+	app.Post(
+		"/api/qr",
+		middleware.JWTProtected,
+		handlers.ValidateMatrix,
+	)
 
 	log.Fatal(app.Listen(":8080"))
 }
