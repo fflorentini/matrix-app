@@ -14,9 +14,9 @@ func main() {
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:5173",
+		AllowOrigins: "https://matrix-app-frontend-d5fi.onrender.com",
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
-		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+		AllowMethods: "GET,POST,OPTIONS",
 	}))
 
 	app.Get("/health", func(c *fiber.Ctx) error {
