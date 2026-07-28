@@ -13,13 +13,11 @@ func ValidateMatrix(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(&request); err != nil {
 
-    return c.Status(fiber.StatusBadRequest).
-        JSON(fiber.Map{
-            "error": "invalid request body",
-        })
-}
-
-println("Rows:", len(request.Matrix))
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{
+				"error": "invalid request body",
+			})
+	}
 
 	if err := services.ValidateMatrix(
 		request.Matrix,
@@ -32,17 +30,35 @@ println("Rows:", len(request.Matrix))
 	}
 
 	result, err := services.ComputeQR(
-	request.Matrix,
-)
+		request.Matrix,
+	)
 
-if err != nil {
+	if err != nil {
 
-	return c.Status(
-		fiber.StatusInternalServerError,
-	).JSON(fiber.Map{
-		"error": err.Error(),
+		return c.Status(
+			fiber.StatusInternalServerError,
+		).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	statistics, err := services.FetchStatistics(
+		result.Q,
+		result.R,
+	)
+
+	if err != nil {
+
+		return c.Status(
+			fiber.StatusInternalServerError,
+		).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(models.QRResultResponse{
+		Q:          result.Q,
+		R:          result.R,
+		Statistics: *statistics,
 	})
-}
-
-return c.JSON(result)
 }
