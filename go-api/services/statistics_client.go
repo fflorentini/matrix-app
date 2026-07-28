@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"matrix-app/go-api/models"
 	"net/http"
 	"os"
@@ -36,33 +35,55 @@ func FetchStatistics(
 		Timeout: 20 * time.Second,
 	}
 
-	resp, err := client.Post(
-		apiURL,
-		"application/json",
-		bytes.NewBuffer(body),
-	)
-	if err != nil {
-		return nil, err
+	var resp *http.Response
+	var lastErr error
+
+	for attempt := 1; attempt <= 3; attempt++ {
+
+		resp, lastErr = client.Post(
+			apiURL,
+			"application/json",
+			bytes.NewBuffer(body),
+		)
+
+		if lastErr == nil && resp.StatusCode == http.StatusOK {
+			break
+		}
+
+		if resp != nil {
+			resp.Body.Close()
+		}
+
+		if attempt < 3 {
+			time.Sleep(2 * time.Second)
+		}
+	}
+
+	if lastErr != nil {
+		return nil, fmt.Errorf(
+			"statistics api unavailable after 3 attempts: %w",
+			lastErr,
+		)
+	}
+
+	if resp == nil {
+		return nil, fmt.Errorf(
+			"statistics api unavailable after 3 attempts",
+		)
 	}
 
 	defer resp.Body.Close()
 
-	bodyBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf(
-			"statistics api returned status %d: %s",
+			"statistics api returned status %d",
 			resp.StatusCode,
-			string(bodyBytes),
 		)
 	}
 
 	var result models.StatisticsResponse
 
-	err = json.Unmarshal(bodyBytes, &result)
+	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
 		return nil, err
 	}
