@@ -14,7 +14,7 @@ app.get("/health", (_req: Request, res: Response) => {
 
 app.post("/api/statistics", getStatistics);
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Node API listening on ${PORT}`);
