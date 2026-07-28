@@ -183,6 +183,12 @@ The Go API communicates with the Node API through:
 STATISTICS_API_URL=https://matrix-app-node-api.onrender.com/api/statistics
 ```
 
+## Deployment Note
+
+This project is deployed on Render free-tier services.
+
+Render may spin down inactive services. To improve reliability, the Go API includes retry logic when communicating with the statistics service, allowing the application to recover automatically from most cold-start scenarios.
+
 ---
 
 ## Project Structure
