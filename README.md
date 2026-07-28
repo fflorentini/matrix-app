@@ -1,46 +1,77 @@
 # Matrix QR Decomposition Platform
 
-A multi-service backend application built with Go and TypeScript that performs QR matrix decomposition, computes matrix statistics, secures endpoints with JWT authentication, and runs through Docker Compose.
+A full-stack multi-service application built with Go, Node.js, TypeScript, and React that performs QR matrix decomposition, computes matrix statistics, secures endpoints with JWT authentication, and runs locally, through Docker Compose, or in the cloud on Render.
+
+---
+
+## Live Demo
+
+### Frontend
+
+https://matrix-app-frontend-d5fi.onrender.com
+
+### Go API
+
+https://matrix-app-go-api.onrender.com
+
+### Node API
+
+https://matrix-app-node-api.onrender.com
+
+### Demo Credentials
+
+```json
+{
+  "username": "admin",
+  "password": "admin123"
+}
+```
 
 ---
 
 ## Overview
 
-This project demonstrates a service-oriented architecture where:
+This project demonstrates a distributed architecture composed of three layers:
 
-- A **Go API** performs matrix validation and QR decomposition using Gonum.
-- A **Node.js API** computes statistical information from the decomposition results.
-- Services communicate through HTTP.
-- JWT authentication protects sensitive endpoints.
-- Docker Compose orchestrates the entire system.
+- A **React frontend** provides authentication and matrix input.
+- A **Go API (Fiber)** validates matrices, performs QR decomposition using Gonum, and coordinates the workflow.
+- A **Node.js API (Express + TypeScript)** calculates statistical information from the decomposition results.
+
+Services communicate through HTTP, protected endpoints use JWT authentication, and Docker Compose orchestrates the complete environment.
 
 ---
 
 ## Architecture
 
 ```text
-Client
-  │
-  ▼
+React Frontend
+      │
+      ▼
 Go API (Fiber)
-  │
-  ├── JWT Authentication
-  ├── Matrix Validation
-  ├── QR Decomposition (Gonum)
-  │
-  ▼
+      │
+      ├── JWT Authentication
+      ├── Matrix Validation
+      ├── QR Decomposition (Gonum)
+      │
+      ▼
 Node API (Express + TypeScript)
-  │
-  ├── Statistics Calculation
-  ├── Matrix Analysis
-  │
-  ▼
+      │
+      ├── Statistics Calculation
+      ├── Matrix Analysis
+      │
+      ▼
 Combined Response
 ```
 
 ---
 
 ## Tech Stack
+
+### Frontend
+
+- React
+- TypeScript
+- Vite
 
 ### Go Service
 
@@ -59,10 +90,19 @@ Combined Response
 
 - Docker
 - Docker Compose
+- Render
 
 ---
 
 ## Features
+
+### Frontend
+
+- Browser-based interface
+- JWT authentication
+- Matrix input editor
+- QR decomposition visualization
+- Statistics visualization
 
 ### Authentication
 
@@ -97,7 +137,25 @@ The Node service calculates:
 
 ### Dockerized Deployment
 
-Both services run inside Docker containers and communicate through Docker networking.
+All services run inside Docker containers and communicate through Docker networking.
+
+---
+
+## Deployment
+
+All services are deployed on Render.
+
+| Service  | URL                                           |
+| -------- | --------------------------------------------- |
+| Frontend | https://matrix-app-frontend-d5fi.onrender.com |
+| Go API   | https://matrix-app-go-api.onrender.com        |
+| Node API | https://matrix-app-node-api.onrender.com      |
+
+The Go API communicates with the Node API through:
+
+```text
+STATISTICS_API_URL=https://matrix-app-node-api.onrender.com/api/statistics
+```
 
 ---
 
@@ -106,12 +164,23 @@ Both services run inside Docker containers and communicate through Docker networ
 ```text
 matrix-app/
 │
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── services/
+│   │   ├── types/
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   ├── package.json
+│   └── vite.config.ts
+│
 ├── go-api/
 │   ├── cmd/
 │   ├── handlers/
 │   ├── middleware/
 │   ├── models/
 │   ├── services/
+│   ├── integration/
 │   ├── Dockerfile
 │   └── go.mod
 │
@@ -119,8 +188,10 @@ matrix-app/
 │   ├── src/
 │   │   ├── controllers/
 │   │   ├── services/
-│   │   └── types/
+│   │   ├── types/
+│   │   └── services/statistics.service.test.ts
 │   ├── Dockerfile
+│   ├── jest.config.js
 │   └── package.json
 │
 ├── docker-compose.yml
@@ -150,115 +221,42 @@ docker compose up --build
 
 | Service  | URL                   |
 | -------- | --------------------- |
+| Frontend | http://localhost:5173 |
 | Go API   | http://localhost:8080 |
 | Node API | http://localhost:3000 |
 
 ---
 
-## Authentication
-
-### Login
-
-Endpoint:
-
-```http
-POST /login
-```
-
-Request:
-
-```json
-{
-  "username": "admin",
-  "password": "admin123"
-}
-```
-
-Response:
-
-```json
-{
-  "token": "your-jwt-token"
-}
-```
-
-Save the token and use it in the Authorization header:
-
-```text
-Authorization: Bearer <token>
-```
-
----
-
-## QR Decomposition Endpoint
-
-### Request
-
-```http
-POST /api/qr
-```
-
-Headers:
-
-```text
-Authorization: Bearer <token>
-Content-Type: application/json
-```
-
-Body:
-
-```json
-{
-  "matrix": [
-    [1, 2],
-    [3, 4],
-    [5, 6]
-  ]
-}
-```
-
-### Example Response
-
-```json
-{
-  "q": [
-    [-0.169, 0.8971, 0.4082],
-    [-0.5071, 0.276, -0.8165],
-    [-0.8452, -0.345, 0.4082]
-  ],
-  "r": [
-    [-5.9161, -7.4374],
-    [0, 0.8281],
-    [0, 0]
-  ],
-  "statistics": {
-    "max": 0.8971,
-    "min": -7.4374,
-    "average": -0.8812,
-    "sum": -13.2186,
-    "hasDiagonalMatrix": false
-  }
-}
-```
-
----
-
 ## Local Development
 
-### Start the Go API
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend:
+
+```text
+http://localhost:5173
+```
+
+### Go API
 
 ```bash
 cd go-api
 go run ./cmd
 ```
 
-The Go API will run on:
+Go API:
 
 ```text
 http://localhost:8080
 ```
 
-### Start the Node API
+### Node API
 
 ```bash
 cd node-api
@@ -266,7 +264,7 @@ npm install
 npm run dev
 ```
 
-The Node API will run on:
+Node API:
 
 ```text
 http://localhost:3000
@@ -274,19 +272,53 @@ http://localhost:3000
 
 ---
 
-## Running Tests
+## Testing
 
-### Execute Tests
+### Go Unit and Integration Tests
 
 ```bash
 cd go-api
 go test ./...
 ```
 
-### Coverage Report
+Coverage:
 
 ```bash
 go test ./... -cover
+```
+
+### Node Unit Tests
+
+```bash
+cd node-api
+npm test
+```
+
+Current Node test coverage includes:
+
+- Statistics calculation
+- Diagonal matrix detection
+- Negative value handling
+- Aggregate calculations
+
+### Integration Workflow Tested
+
+The integration suite validates:
+
+```text
+Login
+  ↓
+JWT Generation
+  ↓
+Protected Endpoint Access
+  ↓
+QR Decomposition
+  ↓
+Go → Node Communication
+  ↓
+Statistics Generation
+  ↓
+Combined Response
 ```
 
 ---
@@ -294,6 +326,9 @@ go test ./... -cover
 ## API Flow
 
 ```text
+React Frontend
+        │
+        ▼
 POST /login
         │
         ▼
@@ -316,21 +351,9 @@ Node Statistics API
         │
         ▼
 Combined Response
+        │
+        ▼
+Frontend Visualization
 ```
-
----
-
-## Future Improvements
-
-Potential enhancements:
-
-- PostgreSQL integration
-- User management
-- Calculation history
-- Refresh tokens
-- Swagger/OpenAPI documentation
-- GitHub Actions CI/CD
-- Frontend dashboard
-- Role-based authorization
 
 ---
