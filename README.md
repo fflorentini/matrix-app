@@ -18,7 +18,11 @@ https://matrix-app-go-api.onrender.com
 
 https://matrix-app-node-api.onrender.com
 
-### Demo Credentials
+### Demo Authentication
+
+The frontend uses a predefined demo account when the **Login** button is clicked.
+
+For direct API testing:
 
 ```json
 {
