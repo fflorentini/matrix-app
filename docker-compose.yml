@@ -1,0 +1,16 @@
+services:
+  node-api:
+    build: ./node-api
+    ports:
+      - "3000:3000"
+
+  go-api:
+    build: ./go-api
+    ports:
+      - "8080:8080"
+
+    environment:
+      - STATISTICS_API_URL=http://node-api:3000/api/statistics
+
+    depends_on:
+      - node-api

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"matrix-app/go-api/models"
 	"net/http"
+	"os"
 )
 
 func FetchStatistics(
@@ -22,8 +23,14 @@ func FetchStatistics(
 		return nil, err
 	}
 
+	apiURL := os.Getenv("STATISTICS_API_URL")
+
+	if apiURL == "" {
+		apiURL = "http://localhost:3000/api/statistics"
+	}
+
 	resp, err := http.Post(
-		"http://localhost:3000/api/statistics",
+		apiURL,
 		"application/json",
 		bytes.NewBuffer(body),
 	)
